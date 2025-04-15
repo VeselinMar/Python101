@@ -1,5 +1,4 @@
 import random
-from random import randint
 
 from game_db import quiz_db
 from quiz_game.functions import list_topics, get_wrong_answers, print_result
@@ -36,7 +35,7 @@ while count < questions:
     count += 1
     clean_question = False
     while not clean_question:
-        topic = topics[randint(0, len(topics) - 1)]
+        topic = topics[random.randint(0, len(topics) - 1)]
 
         question = random.choice(list(quiz_db[topic].keys()))
         if question not in asked_questions:
@@ -67,7 +66,7 @@ while count < questions:
 
     if labeled_options.get(user_answer) == correct_answer:
         points += 1
-        print(f'{correct_answer} is the correct answer!')
+        print(f'Yes! {correct_answer} is the correct answer!')
     else:
         print(f'Sorry! The correct answer is: {correct_answer}')
 
