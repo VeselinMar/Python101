@@ -1,73 +1,121 @@
 import random
-
 from game_db import quiz_db
-from quiz_game.functions import list_topics, get_wrong_answers, print_result
+from functions import (
+    list_topics, get_wrong_answers, print_result,
+    add_question, remove_question, add_topic, load_db
+)
 
-print("Welcome to Quiz Game")
+def play_quiz():
+    db = load_db()
+    print("Welcome to Quiz Game")
 
-# get topics
-topics = []
-while not topics:
-    topics = input(f'You can choose to play a quiz from the following topics: \n{list_topics(quiz_db)}' 
-                   f'\nYou can choose more than one '
-                   f'but please choose them by writing the full names of the topics separated by spaces: ').split(' ')
-    for topic in topics:
-        if topic not in list_topics(quiz_db):
-            topics = []
-            print('Invalid topic. Please try again.')
+    # get topics
+    topics = []
+    while not topics:
+        topics = input(
+            f'You can choose to play a quiz from the following topics: \n{list_topics(db)}'
+            f'\nYou can choose more than one, separated by spaces: '
+        ).split(' ')
+        for topic in topics:
+            if topic not in db:
+                topics = []
+                print('Invalid topic. Please try again.')
 
-# get number of questions to be asked
-questions = 0
-while questions == 0:
-    try:
-        questions = int(input("How many questions would you like to try answering: "))
-    except ValueError as e:
-        print("Sorry, I didn't understand that. Please provide a number.")
+    # get number of questions
+    questions = 0
+    while questions == 0:
+        try:
+            questions = int(input("How many questions would you like to try answering: "))
+        except ValueError:
+            print("Sorry, I didn't understand that. Please provide a number.")
 
-count = 0
-points = 0
+    count = 0
+    points = 0
+    asked_questions = set()
 
-# Keep track of already asked questions
-asked_questions = set()
+    while count < questions:
+        count += 1
+        clean_question = False
+        while not clean_question:
+            topic = random.choice(topics)
+            question = random.choice(list(db[topic].keys()))
+            if question not in asked_questions:
+                asked_questions.add(question)
+                clean_question = True
 
-# Main game logic
-while count < questions:
-    count += 1
-    clean_question = False
-    while not clean_question:
-        topic = topics[random.randint(0, len(topics) - 1)]
+        correct_answer = db[topic][question]
+        other_answers = get_wrong_answers(question, correct_answer, topic, db)
+        wrong_answers = random.sample(other_answers, min(3, len(other_answers)))
 
-        question = random.choice(list(quiz_db[topic].keys()))
-        if question not in asked_questions:
-            asked_questions.add(question)
-            clean_question = True
+        options = wrong_answers + [correct_answer]
+        random.shuffle(options)
 
-    # Get the correct answer
-    correct_answer = quiz_db[topic][question]
+        option_labels = ['a', 'b', 'c', 'd']
+        labeled_options = dict(zip(option_labels, options))
 
-    # Get 3 wrong answers
-    other_answers = get_wrong_answers(question ,correct_answer, topic, quiz_db)
-    wrong_answers = random.sample(other_answers, min(3, len(other_answers)))
+        print(f'\nTopic: {topic}')
+        print(f'Question: {question}')
+        for label in labeled_options:
+            print(f'\t{label}: {labeled_options[label]}')
 
-    options = wrong_answers + [correct_answer]
+        user_answer = input(f'Your choice (a, b, c, d): ').lower().strip()
 
-    random.shuffle(options)
+        if labeled_options.get(user_answer) == correct_answer:
+            points += 1
+            print(f'✅ Correct! {correct_answer}')
+        else:
+            print(f'❌ Sorry! The correct answer is: {correct_answer}')
 
-    option_labels = ['a', 'b', 'c', 'd']
-    labeled_options = dict(zip(option_labels, options))
+    print_result(points, questions)
 
-    print(f'\nTopic: {topic}')
-    print(f'Question: {question}')
-    for label in labeled_options:
-        print(f'\t{label}: {labeled_options[label]}')
+def editor_menu():
+    while True:
+        print("\n--- Quiz Database Editor ---")
+        print("1. Add Question")
+        print("2. Remove Question")
+        print("3. Add Topic")
+        print("4. Back to Main Menu")
 
+        choice = input("Choose an option: ").strip()
 
-    user_answer = input(f'Your choice (a, b, c, d):').lower().strip()
+        if choice == "1":
+            topic = input("Enter topic: ").strip()
+            q = input("Enter question: ").strip()
+            a = input("Enter answer: ").strip()
+            add_question(topic, q, a)
 
-    if labeled_options.get(user_answer) == correct_answer:
-        points += 1
-        print(f'Yes! {correct_answer} is the correct answer!')
-    else:
-        print(f'Sorry! The correct answer is: {correct_answer}')
+        elif choice == "2":
+            topic = input("Enter topic: ").strip()
+            q = input("Enter question to remove: ").strip()
+            remove_question(topic, q)
 
-print_result(points, questions)
+        elif choice == "3":
+            topic = input("Enter new topic name: ").strip()
+            add_topic(topic)
+
+        elif choice == "4":
+            break
+        else:
+            print("Invalid choice. Try again.")
+
+def main_menu():
+    while True:
+        print("\n--- Main Menu ---")
+        print("1. Play Quiz")
+        print("2. Edit Database")
+        print("3. Exit")
+
+        choice = input("Choose an option: ").strip()
+
+        if choice == "1":
+            play_quiz()
+        elif choice == "2":
+            editor_menu()
+        elif choice == "3":
+            print("Goodbye!")
+            break
+        else:
+            print("Invalid choice. Try again.")
+
+if __name__ == "__main__":
+    main_menu()
