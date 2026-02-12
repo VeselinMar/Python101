@@ -4,8 +4,6 @@ A collection of extended simple Python projects and practice exercises demonstra
 
 This repository contains small Python programs I built while learning Python and reinforcing core programming concepts such as control flow, functions, loops, and basic algorithms. Each project focuses on a different topic and illustrates practical usage of Python syntax and problem-solving.
 
----
-
 ## What’s in This Repository
 
 These projects cover beginner and early-intermediate Python topics, including:
@@ -22,7 +20,6 @@ Each directory or script typically contains:
 - A README or comment block explaining the problem
 - Example input/output
 
----
 
 ## Project List
 
@@ -30,10 +27,10 @@ Here are some of the included fun and educational scripts:
 ```
 | Project | Description |
 |---------|-------------|
-| `find_root_of_quadratic_e` | Solves quadratic equations using the quadratic formula |
-| `quiz_game` | A simple interactive quiz game |
+| `find_root_of_quadratic_e` | Solves quadratic equations using the quadratic formula. Accepts coefficients as input and calculates real or complex roots. |
+| `quiz_game` | A simple interactive quiz game where users answer multiple-choice questions and receive a score at the end. |
 ```
----
+
 ## How to Run
 
 To run any of the included scripts:
@@ -63,3 +60,9 @@ Feel free to suggest improvements or expand with your own practice projects!
 2. Add or improve Python scripts
 3. Update this README with brief descriptions
 4. Create a pull request
+
+## Author
+
+Veselin Marinov
+Junior Python Developer
+GitHub: VeselinMar
